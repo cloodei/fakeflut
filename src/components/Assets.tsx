@@ -121,7 +121,7 @@ export default function Assets() {
       )}
       
       {/* Header */}
-      <div className="bg-gradient-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-6">
+      <div className="bg-linear-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-white text-2xl">Asset Management</h1>
           <button
@@ -163,7 +163,7 @@ export default function Assets() {
             <div className="space-y-3">
               {auditLog.map((entry) => (
                 <div key={entry.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                       entry.action === 'borrowed' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
                     }`}>

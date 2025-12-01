@@ -46,11 +46,11 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   };
 
   return (
-    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] animate-slide-down">
+    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-100 animate-slide-down">
       <div className={`${getBackground()} border-2 rounded-2xl shadow-2xl px-5 py-4 flex items-center gap-3 min-w-[280px] max-w-md`}>
-        <div className="flex-shrink-0">{getIcon()}</div>
+        <div className="shrink-0">{getIcon()}</div>
         <p className="text-gray-800 flex-1">{message}</p>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 shrink-0">
           <X size={18} />
         </button>
       </div>
