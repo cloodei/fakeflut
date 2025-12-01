@@ -22,7 +22,11 @@ interface AuditEntry {
   timestamp: string;
 }
 
-export default function Assets() {
+interface AssetsProps {
+  className: string;
+}
+
+export default function Assets({ className }: AssetsProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -40,14 +44,14 @@ export default function Assets() {
       name: 'Classroom Key',
       icon: '🔑',
       status: 'available',
-      lastBorrowed: 'Yesterday by John'
+      lastBorrowed: 'Yesterday · John'
     },
     {
       id: 3,
       name: 'Microphone',
       icon: '🎤',
       status: 'available',
-      lastBorrowed: '2 days ago by Emma'
+      lastBorrowed: '2 days ago · Emma'
     },
     {
       id: 4,
@@ -72,111 +76,108 @@ export default function Assets() {
   ];
 
   const auditLog: AuditEntry[] = [
-    {
-      id: 1,
-      assetName: 'Classroom Remote',
-      action: 'borrowed',
-      userName: 'Sarah Lee',
-      timestamp: '2 hours ago'
-    },
-    {
-      id: 2,
-      assetName: 'Classroom Key',
-      action: 'returned',
-      userName: 'John Smith',
-      timestamp: 'Yesterday at 5:30 PM'
-    },
-    {
-      id: 3,
-      assetName: 'Whiteboard Markers',
-      action: 'borrowed',
-      userName: 'Mike Chen',
-      timestamp: '1 hour ago'
-    },
-    {
-      id: 4,
-      assetName: 'Microphone',
-      action: 'returned',
-      userName: 'Emma Wilson',
-      timestamp: '2 days ago'
-    },
-    {
-      id: 5,
-      assetName: 'HDMI Cable',
-      action: 'returned',
-      userName: 'You',
-      timestamp: '3 days ago'
-    }
+    { id: 1, assetName: 'Classroom Remote', action: 'borrowed', userName: 'Sarah Lee', timestamp: '2 hours ago' },
+    { id: 2, assetName: 'Classroom Key', action: 'returned', userName: 'John Smith', timestamp: 'Yesterday · 17:30' },
+    { id: 3, assetName: 'Whiteboard Markers', action: 'borrowed', userName: 'Mike Chen', timestamp: '1 hour ago' },
+    { id: 4, assetName: 'Microphone', action: 'returned', userName: 'Emma Wilson', timestamp: '2 days ago' },
+    { id: 5, assetName: 'HDMI Cable', action: 'returned', userName: 'You', timestamp: '3 days ago' }
   ];
 
   const handleBorrow = (assetName: string) => {
-    setToastMessage(`Successfully borrowed ${assetName}`);
+    setToastMessage(`Borrow request logged for ${assetName}`);
   };
 
   return (
-    <div className="min-h-screen bg-[#303080]">
-      {/* Toast */}
+    <div className="space-y-5">
       {toastMessage && (
         <Toast message={toastMessage} type="success" onClose={() => setToastMessage(null)} />
       )}
-      
-      {/* Header */}
-      <div className="bg-linear-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-white text-2xl">Asset Management</h1>
+
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(151,168,226,0.18)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#9AA3C7]">{className}</p>
+            <h1 className="text-2xl font-semibold text-[#0E1B3D]">Asset Management</h1>
+          </div>
           <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl text-white flex items-center gap-2"
+            onClick={() => setShowHistory(true)}
+            className="flex items-center gap-2 rounded-2xl border border-[#E0E7FF] px-3 py-2 text-xs font-semibold text-[#3F73FF]"
           >
-            <History size={18} />
-            <span className="text-sm">History</span>
+            <History size={16} /> History
           </button>
         </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <p className="text-white/70 text-sm mb-1">Available</p>
-            <p className="text-white text-2xl">{assets.filter(a => a.status === 'available').length}</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-            <p className="text-white/70 text-sm mb-1">In Use</p>
-            <p className="text-white text-2xl">{assets.filter(a => a.status === 'in_use').length}</p>
-          </div>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <StatCard label="Available" value={assets.filter((a) => a.status === 'available').length} accent="#1BA37A" />
+          <StatCard label="In use" value={assets.filter((a) => a.status === 'in_use').length} accent="#FF6B6B" />
         </div>
-      </div>
+      </section>
 
-      {/* Audit Log Modal */}
-      {showHistory && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-md rounded-t-3xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl text-gray-800">📋 Audit Log</h2>
+      <section className="grid grid-cols-2 gap-4">
+        {assets.map((asset) => (
+          <div key={asset.id} className="rounded-3xl border border-[#E0E7FF] bg-white px-4 py-4 shadow-[0_8px_20px_rgba(151,168,226,0.12)]">
+            <div className="text-4xl text-center">{asset.icon}</div>
+            <h3 className="mt-3 text-center text-sm font-semibold text-[#0E1B3D]">{asset.name}</h3>
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <Circle size={10} className={asset.status === 'available' ? 'text-[#1BA37A] fill-current' : 'text-[#FF6B6B] fill-current'} />
+              <span className={`text-xs font-medium ${asset.status === 'available' ? 'text-[#1BA37A]' : 'text-[#FF6B6B]'}`}>
+                {asset.status === 'available' ? 'Available' : 'In use'}
+              </span>
+            </div>
+            {asset.status === 'in_use' && asset.borrowedBy && (
+              <div className="mt-3 rounded-2xl border border-[#F8C5CD] bg-[#FFF1F3] px-3 py-2 text-xs text-[#E05264]">
+                <p>Held by {asset.borrowedBy}</p>
+                <p className="text-[11px] text-[#C97282]">Since {asset.borrowedSince}</p>
+              </div>
+            )}
+            {asset.status === 'available' && asset.lastBorrowed && (
+              <p className="mt-3 text-center text-xs text-[#8B95BF]">{asset.lastBorrowed}</p>
+            )}
+            {asset.status === 'available' ? (
               <button
-                onClick={() => setShowHistory(false)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => handleBorrow(asset.name)}
+                className="mt-3 w-full rounded-2xl bg-linear-to-r from-[#7DE2FF] to-[#598BFF] py-2.5 text-xs font-semibold text-white"
               >
+                Borrow
+              </button>
+            ) : (
+              <button className="mt-3 w-full rounded-2xl border border-[#E0E7FF] py-2.5 text-xs font-semibold text-[#BAC3DE]" disabled>
+                Unavailable
+              </button>
+            )}
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_8px_20px_rgba(151,168,226,0.12)]">
+        <h3 className="text-sm font-semibold text-[#0E1B3D]">Legend</h3>
+        <div className="mt-3 space-y-2 text-sm text-[#5B678C]">
+          <LegendItem color="#1BA37A" label="Available for borrowing" />
+          <LegendItem color="#FF6B6B" label="Currently in use" />
+        </div>
+      </section>
+
+      {showHistory && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-t-3xl border border-[#E0E7FF] bg-white p-6 shadow-[0_-12px_35px_rgba(35,55,125,0.18)]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-[#0E1B3D]">Audit trail</h2>
+              <button onClick={() => setShowHistory(false)} className="text-[#8B95BF]">
                 ✕
               </button>
             </div>
-
-            <div className="space-y-3">
+            <div className="mt-4 max-h-[60vh] space-y-3 overflow-y-auto">
               {auditLog.map((entry) => (
-                <div key={entry.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0">
-                  <div className="shrink-0">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      entry.action === 'borrowed' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
-                    }`}>
-                      {entry.action === 'borrowed' ? '📤' : '📥'}
-                    </div>
+                <div key={entry.id} className="flex gap-3 rounded-2xl border border-[#E0E7FF] px-4 py-3">
+                  <div className={`flex size-10 items-center justify-center rounded-full ${
+                    entry.action === 'borrowed' ? 'bg-[#FFF5E6] text-[#C97C00]' : 'bg-[#E5F9F2] text-[#1BA37A]'
+                  }`}>
+                    {entry.action === 'borrowed' ? '📤' : '📥'}
                   </div>
-                  <div className="flex-1">
-                    <p className="text-gray-800">
-                      <span className="font-medium">{entry.userName}</span>
-                      {' '}{entry.action === 'borrowed' ? 'borrowed' : 'returned'}{' '}
-                      <span className="font-medium">{entry.assetName}</span>
+                  <div className="flex-1 text-sm text-[#0E1B3D]">
+                    <p>
+                      <span className="font-semibold">{entry.userName}</span> {entry.action} {entry.assetName}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">{entry.timestamp}</p>
+                    <p className="text-xs text-[#8B95BF]">{entry.timestamp}</p>
                   </div>
                 </div>
               ))}
@@ -184,79 +185,26 @@ export default function Assets() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
 
-      {/* Assets Grid */}
-      <div className="px-6 py-6">
-        <div className="grid grid-cols-2 gap-4">
-          {assets.map((asset) => (
-            <div key={asset.id} className="bg-white rounded-2xl p-5 shadow-lg">
-              {/* Asset Icon */}
-              <div className="text-4xl mb-4 text-center">{asset.icon}</div>
+function StatCard({ label, value, accent }: { label: string; value: number; accent: string }) {
+  return (
+    <div className="rounded-2xl border border-[#E0E7FF] bg-[#F8FAFF] px-4 py-4 text-sm text-[#5B678C]">
+      <p>{label}</p>
+      <p className="text-2xl font-semibold" style={{ color: accent }}>
+        {value}
+      </p>
+    </div>
+  );
+}
 
-              {/* Asset Name */}
-              <h3 className="text-gray-800 text-center mb-3">{asset.name}</h3>
-
-              {/* Status Indicator */}
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Circle
-                  size={10}
-                  className={asset.status === 'available' ? 'text-emerald-500 fill-current' : 'text-rose-500 fill-current'}
-                />
-                <span className={`text-sm ${
-                  asset.status === 'available' ? 'text-emerald-600' : 'text-rose-600'
-                }`}>
-                  {asset.status === 'available' ? 'Available' : 'In Use'}
-                </span>
-              </div>
-
-              {/* Info */}
-              {asset.status === 'in_use' && asset.borrowedBy && (
-                <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 mb-3">
-                  <p className="text-xs text-rose-600 mb-1">Held by</p>
-                  <p className="text-sm text-gray-800">{asset.borrowedBy}</p>
-                  <p className="text-xs text-gray-500 mt-1">Since {asset.borrowedSince}</p>
-                </div>
-              )}
-
-              {asset.status === 'available' && asset.lastBorrowed && (
-                <p className="text-xs text-gray-500 text-center mb-3">{asset.lastBorrowed}</p>
-              )}
-
-              {/* Action Button */}
-              {asset.status === 'available' ? (
-                <button
-                  onClick={() => handleBorrow(asset.name)}
-                  className="w-full bg-[#FF4D6D] text-white py-2.5 rounded-xl hover:bg-[#ff3355] transition-colors"
-                >
-                  Borrow
-                </button>
-              ) : (
-                <button
-                  disabled
-                  className="w-full bg-gray-100 text-gray-400 py-2.5 rounded-xl cursor-not-allowed"
-                >
-                  Unavailable
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-8 bg-white rounded-2xl p-5 shadow-lg">
-          <h3 className="text-gray-800 mb-4">Legend</h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Circle size={12} className="text-emerald-500 fill-current" />
-              <span className="text-sm text-gray-600">Available for borrowing</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <Circle size={12} className="text-rose-500 fill-current" />
-              <span className="text-sm text-gray-600">Currently in use by another student</span>
-            </div>
-          </div>
-        </div>
-      </div>
+function LegendItem({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Circle size={10} style={{ color }} className="fill-current" />
+      <span>{label}</span>
     </div>
   );
 }

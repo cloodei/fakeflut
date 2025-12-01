@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Check, Clock, Trophy, Users } from 'lucide-react';
+import { Camera, Check, Clock, Trophy } from 'lucide-react';
 
 type TaskStatus = 'pending' | 'waiting_approval' | 'done';
 
@@ -13,7 +13,11 @@ interface Task {
   points: number;
 }
 
-export default function DutyRoster() {
+interface DutyRosterProps {
+  className: string;
+}
+
+export default function DutyRoster({ className }: DutyRosterProps) {
   const [viewMode, setViewMode] = useState<'my' | 'full'>('my');
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -21,16 +25,16 @@ export default function DutyRoster() {
     {
       id: 1,
       title: 'Clean Whiteboard',
-      time: '2:00 PM - Today',
+      time: 'Today · 14:00',
       assignee: 'You',
       avatar: '👤',
       status: 'pending',
-      points: 10
+      points: 12
     },
     {
       id: 2,
-      title: 'Arrange Chairs',
-      time: '10:00 AM - Tomorrow',
+      title: 'Arrange seating grid',
+      time: 'Tomorrow · 10:00',
       assignee: 'You',
       avatar: '👤',
       status: 'waiting_approval',
@@ -38,7 +42,7 @@ export default function DutyRoster() {
     },
     {
       id: 3,
-      title: 'Take Attendance',
+      title: 'Attendance scan',
       time: 'Yesterday',
       assignee: 'You',
       avatar: '👤',
@@ -47,21 +51,12 @@ export default function DutyRoster() {
     },
     {
       id: 4,
-      title: 'Lock Classroom',
-      time: '5:00 PM - Today',
+      title: 'Lock classroom',
+      time: 'Today · 17:00',
       assignee: 'John Smith',
       avatar: '👨',
       status: 'pending',
       points: 10
-    },
-    {
-      id: 5,
-      title: 'Water Plants',
-      time: 'Tomorrow',
-      assignee: 'Sarah Lee',
-      avatar: '👩',
-      status: 'done',
-      points: 15
     }
   ];
 
@@ -73,94 +68,118 @@ export default function DutyRoster() {
     { rank: 5, name: 'Emma Wilson', points: 250, avatar: '👩‍💼', badge: '' }
   ];
 
-  const filteredTasks = viewMode === 'my' 
-    ? tasks.filter(task => task.assignee === 'You')
-    : tasks;
+  const filteredTasks = viewMode === 'my' ? tasks.filter((task) => task.assignee === 'You') : tasks;
 
-  const getStatusBadge = (status: TaskStatus) => {
-    switch (status) {
-      case 'pending':
-        return <span className="px-3 py-1 bg-amber-100 text-amber-600 rounded-full text-xs">Pending</span>;
-      case 'waiting_approval':
-        return <span className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs">Pending Review</span>;
-      case 'done':
-        return <span className="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-xs flex items-center gap-1">
-          <Check size={14} /> Done
-        </span>;
-    }
-  };
+  const statusBadge = {
+    pending: 'text-[#F39C12] border border-[#F39C12]/30 bg-[#FDF1E2]',
+    waiting_approval: 'text-[#C97C00] border border-[#C97C00]/30 bg-[#FFF5DB]',
+    done: 'text-[#1BA37A] border border-[#1BA37A]/30 bg-[#E4F8F1]'
+  } satisfies Record<TaskStatus, string>;
 
   return (
-    <div className="min-h-screen bg-[#303080]">
-      {/* Header */}
-      <div className="bg-gradient-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-white text-2xl">Duty Roster</h1>
+    <div className="space-y-5">
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(151,168,226,0.18)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#9AA3C7]">{className}</p>
+            <h1 className="text-2xl font-semibold text-[#0E1B3D]">Duty roster</h1>
+          </div>
           <button
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl text-white flex items-center gap-2"
+            onClick={() => setShowLeaderboard(true)}
+            className="flex items-center gap-2 rounded-2xl border border-[#E0E7FF] px-3 py-2 text-xs font-semibold text-[#3F73FF]"
           >
-            <Trophy size={18} />
-            <span className="text-sm">Leaderboard</span>
+            <Trophy size={14} /> Leaderboard
           </button>
         </div>
-
-        {/* View Toggle */}
-        <div className="flex gap-2 bg-white/10 backdrop-blur-sm p-1.5 rounded-xl">
-          <button
-            onClick={() => setViewMode('my')}
-            className={`flex-1 py-2.5 rounded-lg transition-all ${
-              viewMode === 'my'
-                ? 'bg-white text-[#303080]'
-                : 'text-white'
-            }`}
-          >
-            My Duties
-          </button>
-          <button
-            onClick={() => setViewMode('full')}
-            className={`flex-1 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 ${
-              viewMode === 'full'
-                ? 'bg-white text-[#303080]'
-                : 'text-white'
-            }`}
-          >
-            <Users size={18} />
-            Full Schedule
-          </button>
+        <div className="mt-4 flex gap-2 rounded-2xl border border-[#E0E7FF] bg-[#F8FAFF] p-1 text-sm">
+          {['my', 'full'].map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode as 'my' | 'full')}
+              className={`flex-1 rounded-xl py-2 capitalize transition ${
+                viewMode === mode ? 'bg-white text-[#3F73FF] shadow-[0_6px_15px_rgba(90,114,255,0.15)]' : 'text-[#8B95BF]'
+              }`}
+            >
+              {mode === 'my' ? 'My duties' : 'Full schedule'}
+            </button>
+          ))}
         </div>
-      </div>
+      </section>
 
-      {/* Leaderboard Modal */}
+      <section className="space-y-3">
+        {filteredTasks.map((task) => (
+          <div key={task.id} className="rounded-3xl border border-[#E0E7FF] bg-white px-5 py-4 shadow-[0_8px_20px_rgba(184,196,236,0.25)]">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-[#8B95BF]">{task.time}</p>
+                <h3 className="text-lg font-semibold text-[#0E1B3D]">{task.title}</h3>
+              </div>
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadge[task.status]}`}>
+                {task.status === 'pending' && 'Upload proof'}
+                {task.status === 'waiting_approval' && 'Pending approval'}
+                {task.status === 'done' && 'Verified'}
+              </span>
+            </div>
+            <div className="mt-4 flex items-center gap-3 border-t border-[#EEF1FF] pt-4">
+              <div className="flex size-12 items-center justify-center rounded-2xl bg-[#F3F5FF] text-2xl">{task.avatar}</div>
+              <div>
+                <p className="text-xs text-[#8B95BF]">Assignee</p>
+                <p className="text-sm font-semibold text-[#0E1B3D]">{task.assignee}</p>
+              </div>
+              <div className="ml-auto text-right">
+                <p className="text-xs text-[#8B95BF]">Points</p>
+                <p className="text-base font-semibold text-[#1BA37A]">+{task.points}</p>
+              </div>
+            </div>
+            {task.status === 'pending' && task.assignee === 'You' && (
+              <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-[#7DE2FF] to-[#598BFF] py-3 text-sm font-semibold text-white shadow-[0_10px_25px_rgba(108,139,255,0.3)]">
+                <Camera size={16} /> Upload proof
+              </button>
+            )}
+            {task.status === 'waiting_approval' && task.assignee === 'You' && (
+              <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#F4C15D] bg-[#FFF9E9] px-3 py-3 text-xs text-[#B67A00]">
+                <Clock size={14} /> Pending admin review
+              </div>
+            )}
+            {task.status === 'done' && (
+              <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#B1E5D4] bg-[#F0FBF7] px-3 py-3 text-xs text-[#1BA37A]">
+                <Check size={14} /> Task completed · proof verified
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
+
       {showLeaderboard && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center">
-          <div className="bg-white w-full max-w-md rounded-t-3xl p-6 animate-slide-up max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl text-gray-800">🏆 Contribution Leaderboard</h2>
-              <button
-                onClick={() => setShowLeaderboard(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-t-3xl border border-[#E0E7FF] bg-white p-6 shadow-[0_-12px_35px_rgba(35,55,125,0.18)]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-[#9AA3C7]">FR3.4 Leaderboard</p>
+                <h2 className="text-xl font-semibold text-[#0E1B3D]">Contribution pulse</h2>
+              </div>
+              <button onClick={() => setShowLeaderboard(false)} className="text-[#8B95BF]">
                 ✕
               </button>
             </div>
-
-            <div className="space-y-3">
+            <div className="mt-5 space-y-3">
               {leaderboard.map((entry) => (
                 <div
                   key={entry.rank}
-                  className={`flex items-center gap-4 p-4 rounded-xl ${
-                    entry.rank <= 3 ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200' : 'bg-gray-50'
+                  className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${
+                    entry.rank <= 3
+                      ? 'border-[#EFD7FF] bg-linear-to-r from-[#FDEFFB] to-[#F3F6FF]'
+                      : 'border-[#E0E7FF] bg-[#F8FAFF]'
                   }`}
                 >
                   <div className="text-2xl">{entry.badge || `#${entry.rank}`}</div>
                   <div className="text-3xl">{entry.avatar}</div>
                   <div className="flex-1">
-                    <p className="text-gray-800">{entry.name}</p>
-                    <p className="text-sm text-gray-500">{entry.points} points</p>
+                    <p className="text-sm font-semibold text-[#0E1B3D]">{entry.name}</p>
+                    <p className="text-xs text-[#8B95BF]">{entry.points} pts</p>
                   </div>
                   {entry.name === 'You' && (
-                    <span className="px-2 py-1 bg-[#FF4D6D] text-white text-xs rounded-full">You</span>
+                    <span className="rounded-full border border-[#3F73FF] px-3 py-1 text-[11px] text-[#3F73FF]">You</span>
                   )}
                 </div>
               ))}
@@ -168,62 +187,6 @@ export default function DutyRoster() {
           </div>
         </div>
       )}
-
-      {/* Tasks List */}
-      <div className="px-6 py-6 space-y-4">
-        {filteredTasks.map((task) => (
-          <div key={task.id} className="bg-white rounded-2xl p-5 shadow-lg">
-            {/* Task Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-gray-800 mb-1">{task.title}</h3>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Clock size={14} />
-                  <span>{task.time}</span>
-                </div>
-              </div>
-              {getStatusBadge(task.status)}
-            </div>
-
-            {/* Assignee */}
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#FF4D6D] to-pink-400 rounded-full flex items-center justify-center text-xl">
-                {task.avatar}
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Assigned to</p>
-                <p className="text-gray-800">{task.assignee}</p>
-              </div>
-              <div className="ml-auto text-right">
-                <p className="text-sm text-gray-500">Points</p>
-                <p className="text-emerald-600">+{task.points}</p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            {task.status === 'pending' && task.assignee === 'You' && (
-              <button className="w-full bg-[#FF4D6D] text-white py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff3355] transition-colors">
-                <Camera size={20} />
-                Upload Proof
-              </button>
-            )}
-
-            {task.status === 'waiting_approval' && task.assignee === 'You' && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
-                <Clock className="text-amber-600" size={20} />
-                <span className="text-amber-800 text-sm">Pending Admin Review</span>
-              </div>
-            )}
-
-            {task.status === 'done' && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-2">
-                <Check className="text-emerald-600" size={20} />
-                <span className="text-emerald-800 text-sm">Task Completed</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

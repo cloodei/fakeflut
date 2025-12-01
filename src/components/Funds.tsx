@@ -22,7 +22,7 @@ interface DebtEntry {
 }
 
 export default function Funds() {
-  const [showDebtList, setShowDebtList] = useState(false);
+  const [showDebtList, setShowDebtList] = useState(true);
   const totalBalance = 5000000;
 
   const transactions: Transaction[] = [
@@ -119,122 +119,103 @@ export default function Funds() {
   };
 
   return (
-    <div className="min-h-screen bg-[#303080]">
-      {/* Header */}
-      <div className="bg-gradient-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-6">
-        <h1 className="text-white text-2xl mb-6">Class Fund</h1>
-
-        {/* Balance Display */}
-        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 shadow-2xl mb-4">
-          <p className="text-white/80 text-sm mb-2">Total Fund Balance</p>
-          <p className="text-white text-4xl mb-4">{formatCurrency(totalBalance)}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <p className="text-white/80 text-xs mb-1">Total Income</p>
-              <p className="text-white text-lg">{formatCurrency(totalIncome)}</p>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <p className="text-white/80 text-xs mb-1">Total Expense</p>
-              <p className="text-white text-lg">{formatCurrency(totalExpense)}</p>
-            </div>
+    <div className="space-y-6">
+      <section className="rounded-3xl border border-white/40 bg-linear-to-br from-[#1F2F78] to-[#3F73FF] px-5 py-5 text-white shadow-[0_20px_45px_rgba(36,61,136,0.35)]">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">Total Fund</p>
+            <p className="text-3xl font-semibold">{formatCurrency(totalBalance)}</p>
+            <p className="text-xs text-white/70">Updated 3 mins ago</p>
+          </div>
+          <button className="flex items-center gap-1 rounded-2xl border border-white/30 px-3 py-2 text-xs font-semibold">
+            <Download size={14} /> Export
+          </button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-white/75">Income</p>
+            <p className="text-lg font-semibold">{formatCurrency(totalIncome)}</p>
+          </div>
+          <div className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-white/75">Expenses</p>
+            <p className="text-lg font-semibold">{formatCurrency(totalExpense)}</p>
           </div>
         </div>
+      </section>
 
-        {/* Debt Alert */}
-        {debtList.length > 0 && (
+      <section className="rounded-3xl border border-[#EAD9E1] bg-white px-5 py-5 shadow-[0_12px_35px_rgba(203,149,166,0.15)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#C26A7A]">Unpaid members</p>
+            <p className="text-base font-semibold text-[#0E1B3D]">{debtList.length} students owing</p>
+          </div>
           <button
-            onClick={() => setShowDebtList(!showDebtList)}
-            className="w-full bg-rose-500 text-white rounded-xl p-4 flex items-center justify-between hover:bg-rose-600 transition-colors"
+            onClick={() => setShowDebtList((prev) => !prev)}
+            className="text-xs font-semibold text-[#E05264]"
           >
-            <div className="flex items-center gap-3">
-              <AlertCircle size={24} />
-              <div className="text-left">
-                <p className="text-sm">Unpaid Members</p>
-                <p className="text-xs text-white/80">{debtList.length} students have pending payments</p>
-              </div>
-            </div>
-            <span className="text-2xl">{showDebtList ? '▼' : '▶'}</span>
+            {showDebtList ? 'Hide' : 'Reveal'} list
           </button>
-        )}
-      </div>
-
-      {/* Debt List */}
-      {showDebtList && (
-        <div className="px-6 py-4 bg-rose-50 border-t-4 border-rose-500">
-          <h3 className="text-gray-800 mb-4">💸 Debt List</h3>
-          <div className="space-y-3">
+        </div>
+        {showDebtList && (
+          <div className="mt-4 space-y-3">
             {debtList.map((debt) => (
-              <div key={debt.id} className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-rose-500">
-                <div className="flex items-start justify-between mb-2">
+              <div key={debt.id} className="rounded-2xl border border-[#F5CED6] bg-[#FFF6F8] px-4 py-3">
+                <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-gray-800">{debt.studentName}</p>
-                    <p className="text-sm text-gray-500">ID: {debt.studentId}</p>
+                    <p className="text-sm font-semibold text-[#0E1B3D]">{debt.studentName}</p>
+                    <p className="text-xs text-[#8B95BF]">ID · {debt.studentId}</p>
                   </div>
-                  <p className="text-rose-600">{formatCurrency(debt.amountDue)}</p>
+                  <p className="text-sm font-semibold text-[#E05264]">{formatCurrency(debt.amountDue)}</p>
                 </div>
-                <p className={`text-xs ${
-                  debt.dueDate.includes('Overdue') ? 'text-rose-600' : 'text-amber-600'
-                }`}>
-                  {debt.dueDate}
-                </p>
+                <p className={`text-xs ${debt.dueDate.includes('Overdue') ? 'text-[#E05264]' : 'text-[#C26A2B]'}`}>{debt.dueDate}</p>
               </div>
             ))}
+            <p className="text-center text-[11px] uppercase tracking-[0.3em] text-[#C26A7A]">
+              Transparency keeps everyone accountable
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-4 text-center italic">
-            Transparency creates positive peer pressure for timely payments
-          </p>
-        </div>
-      )}
+        )}
+      </section>
 
-      {/* Transactions */}
-      <div className="px-6 py-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white">Transaction History</h2>
-          <button className="text-white/70 text-sm flex items-center gap-1 hover:text-white">
-            <Download size={16} />
-            Export
-          </button>
+      <section className="space-y-4 rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_12px_35px_rgba(151,168,226,0.18)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#9AA3C7]">Ledger</p>
+            <h3 className="text-lg font-semibold text-[#0E1B3D]">Transaction history</h3>
+          </div>
+          <span className="rounded-2xl border border-[#E0E7FF] px-3 py-1 text-[11px] text-[#6B7AA8]">Auto-synced</span>
         </div>
 
         <div className="space-y-3">
           {transactions.map((transaction) => (
-            <div key={transaction.id} className="bg-white rounded-2xl p-4 shadow-lg">
-              <div className="flex items-start gap-4">
-                {/* Icon */}
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  transaction.type === 'income' 
-                    ? 'bg-emerald-100 text-emerald-600' 
-                    : 'bg-rose-100 text-rose-600'
-                }`}>
-                  {transaction.type === 'income' ? (
-                    <TrendingUp size={24} />
-                  ) : (
-                    <TrendingDown size={24} />
-                  )}
+            <div key={transaction.id} className="rounded-3xl border border-[#EEF1FF] px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div
+                  className={`flex size-12 items-center justify-center rounded-2xl ${
+                    transaction.type === 'income' ? 'bg-[#E8F7F1] text-[#1BA37A]' : 'bg-[#FFEFF1] text-[#E05264]'
+                  }`}
+                >
+                  {transaction.type === 'income' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                 </div>
-
-                {/* Details */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-1">
+                <div className="flex-1 text-sm">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-gray-800">{transaction.description}</p>
-                      <p className="text-xs text-gray-500 mt-1">{transaction.category} • {transaction.date}</p>
+                      <p className="font-semibold text-[#0E1B3D]">{transaction.description}</p>
+                      <p className="text-xs text-[#8B95BF]">
+                        {transaction.category} • {transaction.date}
+                      </p>
                     </div>
-                    <p className={`text-lg ${
-                      transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
-                    }`}>
+                    <p
+                      className={`text-base font-semibold ${
+                        transaction.type === 'income' ? 'text-[#1BA37A]' : 'text-[#E05264]'
+                      }`}
+                    >
                       {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </p>
                   </div>
-
-                  {/* Receipt Indicator */}
                   {transaction.hasReceipt && (
-                    <div className="mt-3 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                      <Receipt size={16} className="text-blue-600" />
-                      <span className="text-xs text-blue-600">Receipt Attached</span>
-                      <button className="ml-auto text-xs text-blue-600 hover:underline">
-                        View
-                      </button>
+                    <div className="mt-3 flex items-center gap-2 rounded-2xl border border-[#E0E7FF] bg-[#F7F9FF] px-3 py-2 text-xs text-[#3F73FF]">
+                      <Receipt size={14} /> Evidence attached
                     </div>
                   )}
                 </div>
@@ -243,37 +224,28 @@ export default function Funds() {
           ))}
         </div>
 
-        {/* Summary Card */}
-        <div className="mt-6 bg-white rounded-2xl p-5 shadow-lg">
-          <h3 className="text-gray-800 mb-4">Financial Summary</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <span className="text-gray-600">Total Contributions</span>
-              <span className="text-emerald-600">{formatCurrency(totalIncome)}</span>
-            </div>
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <span className="text-gray-600">Total Expenses</span>
-              <span className="text-rose-600">{formatCurrency(totalExpense)}</span>
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-gray-800">Current Balance</span>
-              <span className="text-xl text-emerald-600">{formatCurrency(totalBalance)}</span>
-            </div>
+        <div className="rounded-3xl border border-[#E3E9FF] bg-[#F9FAFF] px-4 py-4">
+          <div className="flex items-center justify-between border-b border-[#EBEEFD] pb-3 text-sm text-[#5B678C]">
+            <span>Total contributions</span>
+            <span className="font-semibold text-[#1BA37A]">{formatCurrency(totalIncome)}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-[#EBEEFD] py-3 text-sm text-[#5B678C]">
+            <span>Total expenses</span>
+            <span className="font-semibold text-[#E05264]">{formatCurrency(totalExpense)}</span>
+          </div>
+          <div className="flex items-center justify-between pt-3 text-sm text-[#0E1B3D]">
+            <span>Current balance</span>
+            <span className="text-lg font-semibold text-[#1BA37A]">{formatCurrency(totalBalance)}</span>
           </div>
         </div>
 
-        {/* Info Box */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="flex gap-3">
-            <div className="text-blue-600 text-xl">💡</div>
-            <div>
-              <p className="text-sm text-blue-800">
-                All expenses must have receipts attached for transparency and accountability.
-              </p>
-            </div>
+        <div className="rounded-3xl border border-[#E0E7FF] bg-[#F5F7FF] px-4 py-4 text-sm text-[#5B678C]">
+          <div className="flex items-center gap-3">
+            <AlertCircle size={18} className="text-[#3F73FF]" />
+            <p>Expenses are approved only with receipts—keep uploads within 24h.</p>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

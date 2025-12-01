@@ -1,140 +1,151 @@
-import { useState } from 'react';
-import { Bell, Plus, CheckSquare, AlertCircle, Trophy, Eye, EyeOff, Calendar } from 'lucide-react';
+import { Bell, ArrowUpRight, MessageCircle, Activity } from 'lucide-react';
+
+type AccentTone = 'primary' | 'aqua' | 'blush';
 
 interface DashboardProps {
   userName: string;
+  classTitle: string;
   onNavigateToEvents?: () => void;
 }
 
-export default function Dashboard({ userName, onNavigateToEvents }: DashboardProps) {
-  const [notifications, setNotifications] = useState(3);
-  const [balanceVisible, setBalanceVisible] = useState(false);
-
-  const quickStats = [
+export default function Dashboard({ userName, classTitle, onNavigateToEvents }: DashboardProps) {
+  const quickStats: {
+    title: string;
+    badge: string;
+    detail: string;
+    accent: AccentTone;
+  }[] = [
     {
-      title: 'My Next Task',
-      value: 'Clean Board',
-      time: '2:00 PM Today',
-      icon: '🧹',
-      color: 'from-blue-500 to-blue-600'
+      title: 'Approvals',
+      badge: '3 pending',
+      detail: 'Funds · Duty board',
+      accent: 'primary'
     },
     {
-      title: 'Fund Balance',
-      value: balanceVisible ? '₫5,000,000' : '••••••••',
-      subtitle: 'Class Fund',
-      icon: '💰',
-      color: 'from-emerald-500 to-emerald-600',
-      action: () => setBalanceVisible(!balanceVisible),
-      actionIcon: balanceVisible ? <EyeOff size={16} /> : <Eye size={16} />
+      title: 'Duty window',
+      badge: 'Next · 14:00',
+      detail: 'Clean studio boards',
+      accent: 'aqua'
     },
     {
-      title: 'Upcoming Event',
-      value: 'Class Party',
-      time: 'In 3 days',
-      icon: '🎉',
-      color: 'from-purple-500 to-purple-600'
+      title: 'Attendance pulse',
+      badge: '68 RSVPs',
+      detail: 'AI in Edu Forum',
+      accent: 'blush'
     }
   ];
 
-  const menuItems = [
-    { title: 'Create Task', icon: Plus, color: 'bg-[#FF4D6D]', onClick: undefined },
-    { title: 'View Events', icon: Calendar, color: 'bg-purple-500', onClick: onNavigateToEvents },
-    { title: 'Check-in', icon: CheckSquare, color: 'bg-emerald-500', onClick: undefined },
-    { title: 'Report Issue', icon: AlertCircle, color: 'bg-amber-500', onClick: undefined }
+  const notifications = [
+    { label: 'Proof needed', meta: 'Duty · 08:40' },
+    { label: 'Budget approval', meta: 'Funds · 09:15' },
+    { label: 'Event reminder', meta: 'Events · 11:00' }
+  ];
+
+  const recentActivities = [
+    { title: 'Sarah uploaded proof', meta: 'Board cleaned · +10 pts' },
+    { title: '₫1,200,000 collected', meta: 'Fund top-up · Batch B' },
+    { title: 'Assets synced', meta: 'Remote returned · 09:55' },
+    { title: 'Event RSVPs', meta: 'Workshop seats at 80%' }
   ];
 
   return (
-    <div className="min-h-screen bg-[#303080]">
-      {/* Header */}
-      <div className="bg-gradient-to-b from-[#303080] to-[#3838a0] px-6 pt-12 pb-8">
-        <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_15px_35px_rgba(151,168,226,0.2)]">
+        <div className="flex items-center justify-between">
           <div>
-            <p className="text-white/70 text-sm">Welcome back,</p>
-            <h1 className="text-white text-2xl">Hello, {userName}! 👋</h1>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#8B95BF]">Today · {classTitle}</p>
+            <h1 className="text-2xl font-semibold text-[#0E1B3D]">Welcome back, {userName}</h1>
           </div>
-          <button 
-            onClick={() => setNotifications(0)}
-            className="relative bg-white/10 p-3 rounded-xl backdrop-blur-sm"
-          >
-            <Bell className="text-white" size={24} />
-            {notifications > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                {notifications}
-              </span>
-            )}
+          <button className="relative rounded-2xl border border-[#E0E7FF] p-3 text-[#5B678C]">
+            <Bell size={18} />
+            <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-[#FF8DA1] text-[10px] text-white">
+              3
+            </span>
           </button>
         </div>
-
-        {/* Quick Stats */}
-        <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide">
-          {quickStats.map((stat, index) => (
+        <div className="mt-4 flex snap-x gap-3 overflow-x-auto pb-2">
+          {quickStats.map((stat) => (
             <div
-              key={index}
-              onClick={stat.action}
-              className={`min-w-[280px] bg-gradient-to-br ${stat.color} rounded-2xl p-5 text-white shadow-xl ${
-                stat.action ? 'cursor-pointer active:scale-95 transition-transform' : ''
-              }`}
+              key={stat.title}
+              className={`min-w-[220px] snap-start rounded-2xl px-4 py-4 text-white shadow-[0_10px_25px_rgba(63,115,255,0.25)] ${getAccent(stat.accent)}`}
             >
-              <div className="flex items-start justify-between mb-3">
-                <span className="text-3xl">{stat.icon}</span>
-                {stat.actionIcon && (
-                  <div className="bg-white/20 p-1.5 rounded-lg">
-                    {stat.actionIcon}
-                  </div>
-                )}
-              </div>
-              <p className="text-white/80 text-sm mb-1">{stat.title}</p>
-              <p className="text-xl mb-1">{stat.value}</p>
-              {stat.time && <p className="text-white/70 text-sm">{stat.time}</p>}
-              {stat.subtitle && <p className="text-white/70 text-sm">{stat.subtitle}</p>}
+              <p className="text-xs uppercase tracking-[0.2em] text-white/70">{stat.title}</p>
+              <p className="mt-3 text-xl font-semibold">{stat.badge}</p>
+              <p className="text-sm text-white/80">{stat.detail}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Menu Grid */}
-      <div className="px-6 py-6">
-        <h2 className="text-white mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {menuItems.map((item, index) => (
-            <button
-              key={index}
-              onClick={item.onClick}
-              className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-95 flex flex-col items-center gap-3"
-            >
-              <div className={`${item.color} w-14 h-14 rounded-xl flex items-center justify-center`}>
-                <item.icon className="text-white" size={28} />
-              </div>
-              <span className="text-gray-800">{item.title}</span>
-            </button>
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(151,168,226,0.18)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[#9AA3C7]">Mission controls</p>
+            <h2 className="text-lg font-semibold text-[#0E1B3D]">Act within 2 taps</h2>
+          </div>
+          <button
+            onClick={onNavigateToEvents}
+            className="flex items-center gap-1 rounded-2xl border border-[#E0E7FF] px-3 py-2 text-xs font-semibold text-[#3F73FF]"
+          >
+            Go to events <ArrowUpRight size={14} />
+          </button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 text-[#0E1B3D]">
+          <CardAction title="Submit duty" subtitle="Capture + proof" icon={<MessageCircle size={18} />} accent="primary" />
+          <CardAction title="Ping members" subtitle="3 reminders" icon={<Activity size={18} />} accent="aqua" />
+          <CardAction title="Fund ledger" subtitle="₫5M balance" icon={<MessageCircle size={18} />} accent="blush" />
+          <CardAction title="Assets board" subtitle="2 items in use" icon={<Activity size={18} />} accent="primary" />
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_10px_25px_rgba(151,168,226,0.15)]">
+        <p className="text-[11px] uppercase tracking-[0.2em] text-[#9AA3C7]">Realtime feed</p>
+        <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+          {notifications.map((note) => (
+            <div key={note.label} className="min-w-[180px] rounded-2xl border border-[#E0E7FF] bg-[#F9FAFF] px-4 py-3">
+              <p className="text-sm font-semibold text-[#0E1B3D]">{note.label}</p>
+              <p className="text-xs text-[#8B95BF]">{note.meta}</p>
+            </div>
           ))}
         </div>
-
-        {/* Recent Activity */}
-        <div className="mt-8">
-          <h2 className="text-white mb-4">Recent Activity</h2>
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            {[
-              { action: 'Completed task', detail: 'Clean Whiteboard', time: '2 hours ago', status: 'success' },
-              { action: 'Borrowed asset', detail: 'Classroom Remote', time: '5 hours ago', status: 'warning' },
-              { action: 'Paid contribution', detail: '₫500,000', time: 'Yesterday', status: 'success' }
-            ].map((activity, index) => (
-              <div key={index} className="flex items-center gap-4 p-4 border-b last:border-b-0 border-gray-100">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  activity.status === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
-                }`}>
-                  {activity.status === 'success' ? '✓' : '⏱'}
-                </div>
-                <div className="flex-1">
-                  <p className="text-gray-800">{activity.action}</p>
-                  <p className="text-sm text-gray-500">{activity.detail}</p>
-                </div>
-                <p className="text-xs text-gray-400">{activity.time}</p>
-              </div>
-            ))}
-          </div>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {recentActivities.map((activity) => (
+            <div key={activity.title} className="rounded-2xl border border-[#E0E7FF] px-4 py-3 text-left">
+              <p className="text-sm font-semibold text-[#0E1B3D]">{activity.title}</p>
+              <p className="text-xs text-[#8B95BF]">{activity.meta}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
+}
+
+function CardAction({
+  title,
+  subtitle,
+  icon,
+  accent
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  accent: AccentTone;
+}) {
+  return (
+    <button className="flex flex-col gap-2 rounded-2xl border border-[#E0E7FF] px-4 py-4 text-left transition hover:shadow-[0_12px_30px_rgba(63,115,255,0.15)]">
+      <div className={`flex size-9 items-center justify-center rounded-2xl text-white ${getAccent(accent)}`}>{icon}</div>
+      <p className="font-semibold text-[#0E1B3D]">{title}</p>
+      <p className="text-xs text-[#8B95BF]">{subtitle}</p>
+    </button>
+  );
+}
+
+function getAccent(tone: AccentTone) {
+  const map = {
+    primary: 'bg-linear-to-r from-[#2B3FD6] to-[#3F73FF]',
+    aqua: 'bg-linear-to-r from-[#2DA1FF] to-[#7DE2FF]',
+    blush: 'bg-linear-to-r from-[#FF6A88] to-[#FF8DA1]'
+  } as const;
+  return map[tone];
 }
