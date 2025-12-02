@@ -89,7 +89,7 @@ export default function Events({ className }: EventsProps) {
   };
 
   const handlePingNonResponders = (event: EventItem) => {
-    alert(`Sending reminder to ${event.responses.noResponse} students who have not responded to "${event.title}"`);
+    alert(`Pinging ${event.responses.noResponse} classmates for ${event.title}`);
   };
 
   const handleShowQR = (event: EventItem) => {
@@ -105,34 +105,40 @@ export default function Events({ className }: EventsProps) {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-3xl border border-[#E3E9FF] bg-white px-5 py-5 shadow-[0_12px_30px_rgba(151,168,226,0.18)]">
-        <div className="flex items-center justify-between">
+      <section className="rounded-[34px] border border-[#DDE2FB] bg-linear-to-br from-white to-[#F3F5FF] px-5 py-5 shadow-[0_16px_38px_rgba(30,45,102,0.15)]">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#9AA3C7]">{className}</p>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#7D89B7]">{className}</p>
             <h1 className="text-2xl font-semibold text-[#0E1B3D]">Events & Attendance</h1>
+            <p className="text-sm text-[#7B86B0]">RSVP orchestration, check-ins, and nudges.</p>
           </div>
           <button
             onClick={() => setShowAdminView(!showAdminView)}
-            className="flex items-center gap-2 rounded-2xl border border-[#E0E7FF] px-3 py-2 text-xs font-semibold text-[#3F73FF]"
+            className={`flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-semibold transition ${
+              showAdminView
+                ? 'border-[#FFD6E4] bg-[#FFF5F8] text-[#C53F6F]'
+                : 'border-[#E0E6FF] bg-white/80 text-[#2E58FF]'
+            }`}
           >
-            <Users size={16} /> {showAdminView ? 'User View' : 'Admin View'}
+            <Users size={16} /> {showAdminView ? 'Admin view' : 'User view'}
           </button>
         </div>
       </section>
 
       {showQRCode && selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-6">
-          <div className="w-full max-w-sm rounded-3xl border border-[#E0E7FF] bg-white p-6 shadow-[0_25px_65px_rgba(35,55,125,0.2)]">
-            <h2 className="text-xl font-semibold text-[#0E1B3D]">Check-in QR Code</h2>
-            <p className="text-sm text-[#8B95BF]">{selectedEvent.title}</p>
-            <div className="mt-5 flex items-center justify-center rounded-2xl border border-[#E0E7FF] bg-[#F8FAFF] p-6">
-              <div className="flex size-40 items-center justify-center rounded-2xl border border-dashed border-[#BAC3DE]">
-                <QrCode size={120} className="text-[#BAC3DE]" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-6 backdrop-blur">
+          <div className="w-full max-w-sm rounded-[34px] border border-[#E1E6FA] bg-[#FBFCFF] p-6 text-center shadow-[0_30px_55px_rgba(8,12,28,0.45)]">
+            <p className="text-[11px] uppercase tracking-[0.35em] text-[#7D89B7]">Smart check-in</p>
+            <h2 className="text-2xl font-semibold text-[#0E1B3D]">{selectedEvent.title}</h2>
+            <p className="text-sm text-[#7F8AB7]">Show this at the entrance to confirm attendance.</p>
+            <div className="mt-5 rounded-[30px] border border-dashed border-[#C7D1F1] bg-white/80 p-6">
+              <div className="flex items-center justify-center rounded-[24px] border border-[#E4E9FF] bg-[#F6F8FF] p-6">
+                <QrCode size={120} className="text-[#B2BBDC]" />
               </div>
             </div>
             <button
               onClick={() => setShowQRCode(false)}
-              className="mt-6 w-full rounded-2xl bg-linear-to-r from-[#7DE2FF] to-[#598BFF] py-3 text-sm font-semibold text-white"
+              className="mt-6 w-full rounded-[24px] bg-linear-to-r from-[#47A0FF] via-[#2F6BFF] to-[#2E36FF] py-3 text-sm font-semibold uppercase tracking-[0.35em] text-white"
             >
               Close
             </button>
@@ -142,7 +148,10 @@ export default function Events({ className }: EventsProps) {
 
       <section className="space-y-4">
         {events.map((event) => (
-          <div key={event.id} className="rounded-3xl border border-[#E0E7FF] bg-white px-5 py-5 shadow-[0_8px_25px_rgba(151,168,226,0.15)]">
+          <div
+            key={event.id}
+            className="rounded-[32px] border border-[#DFE4FB] bg-white/95 px-5 py-5 shadow-[0_12px_28px_rgba(25,39,94,0.12)]"
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-3">
                 <div>
@@ -151,20 +160,22 @@ export default function Events({ className }: EventsProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm text-[#5B678C]">
                   <div className="flex items-center gap-2">
-                    <Calendar size={16} className="text-[#3F73FF]" />
-                    <span>{event.date} · {event.time}</span>
+                    <Calendar size={16} className="text-[#2F3E9E]" />
+                    <span>
+                      {event.date} · {event.time}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-[#3F73FF]" />
+                    <MapPin size={16} className="text-[#2F3E9E]" />
                     <span>{event.location}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {event.userResponse && (
+            {event.userResponse && !showAdminView && (
               <div
-                className={`mt-4 flex items-center gap-2 rounded-2xl border px-3 py-3 text-sm ${
+                className={`mt-4 flex items-center gap-2 rounded-[22px] border px-3 py-3 text-sm ${
                   event.userResponse === 'registered'
                     ? 'border-[#B1E5D4] bg-[#F0FBF7] text-[#1BA37A]'
                     : 'border-[#F8C5CD] bg-[#FFF1F3] text-[#E05264]'
@@ -178,35 +189,56 @@ export default function Events({ className }: EventsProps) {
             )}
 
             {!showAdminView && (
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex flex-col gap-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleResponse(event.id, 'registered')}
+                    disabled={event.userResponse === 'registered'}
+                    className={`flex-1 rounded-[24px] py-3 text-sm font-semibold uppercase tracking-[0.25em] ${
+                      event.userResponse === 'registered'
+                        ? 'bg-[#F3F5FF] text-[#A7B2D7]'
+                        : 'bg-[#2F3E9E] text-white shadow-[0_12px_28px_rgba(47,62,158,0.3)]'
+                    }`}
+                  >
+                    Join
+                  </button>
+                  <button
+                    onClick={() => handleResponse(event.id, 'declined')}
+                    disabled={event.userResponse === 'declined'}
+                    className={`flex-1 rounded-[24px] border py-3 text-sm font-semibold uppercase tracking-[0.25em] ${
+                      event.userResponse === 'declined'
+                        ? 'border-[#E0E7FF] text-[#C3CADF]'
+                        : 'border-[#E0E7FF] text-[#5B678C]'
+                    }`}
+                  >
+                    Decline
+                  </button>
+                </div>
                 <button
-                  onClick={() => handleResponse(event.id, 'registered')}
-                  disabled={event.userResponse === 'registered'}
-                  className={`flex-1 rounded-2xl py-3 text-sm font-semibold ${
-                    event.userResponse === 'registered'
-                      ? 'bg-[#F3F5FF] text-[#BAC3DE]'
-                      : 'bg-linear-to-r from-[#7DE2FF] to-[#598BFF] text-white shadow-[0_10px_25px_rgba(108,139,255,0.25)]'
+                  onClick={() => handlePingNonResponders(event)}
+                  disabled={event.responses.noResponse === 0}
+                  className={`flex items-center justify-center gap-2 rounded-[24px] border border-dashed py-3 text-sm font-semibold ${
+                    event.responses.noResponse === 0
+                      ? 'border-[#E6E9FF] text-[#B7BEDC]'
+                      : 'border-[#FFCA7A] text-[#7B4100]'
                   }`}
                 >
-                  Join now
-                </button>
-                <button
-                  onClick={() => handleResponse(event.id, 'declined')}
-                  disabled={event.userResponse === 'declined'}
-                  className={`flex-1 rounded-2xl border py-3 text-sm font-semibold ${
-                    event.userResponse === 'declined'
-                      ? 'border-[#E0E7FF] text-[#C3CADF]'
-                      : 'border-[#E0E7FF] text-[#5B678C]'
-                  }`}
-                >
-                  Decline
+                  Ping non-responders ({event.responses.noResponse})
                 </button>
               </div>
             )}
 
             {showAdminView && (
-              <div className="mt-4 space-y-4 rounded-2xl border border-[#E0E7FF] bg-[#F9FAFF] p-4">
-                <h4 className="text-sm font-semibold text-[#0E1B3D]">Response statistics</h4>
+              <div className="mt-4 space-y-4 rounded-[28px] border border-[#E0E7FF] bg-[#F9FAFF] p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-[#0E1B3D]">Response telemetry</h4>
+                  <button
+                    onClick={() => handleShowQR(event)}
+                    className="rounded-full border border-[#D9DFF7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#2E58FF]"
+                  >
+                    QR
+                  </button>
+                </div>
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -231,9 +263,9 @@ export default function Events({ className }: EventsProps) {
                   <button
                     onClick={() => handlePingNonResponders(event)}
                     disabled={event.responses.noResponse === 0}
-                    className={`flex-1 rounded-2xl py-3 text-sm font-semibold ${
+                    className={`flex-1 rounded-[22px] py-3 text-sm font-semibold ${
                       event.responses.noResponse === 0
-                        ? 'bg-[#F3F5FF] text-[#BAC3DE]'
+                        ? 'bg-[#F3F5FF] text-[#A7B2D7]'
                         : 'bg-[#FFCA7A] text-[#7B4100]'
                     }`}
                   >
@@ -241,7 +273,7 @@ export default function Events({ className }: EventsProps) {
                   </button>
                   <button
                     onClick={() => handleShowQR(event)}
-                    className="rounded-2xl border border-[#E0E7FF] px-4 py-3 text-sm font-semibold text-[#3F73FF]"
+                    className="rounded-[22px] border border-[#E0E7FF] px-4 py-3 text-sm font-semibold text-[#2E58FF]"
                   >
                     Generate QR
                   </button>
@@ -249,7 +281,7 @@ export default function Events({ className }: EventsProps) {
               </div>
             )}
 
-            <div className="mt-4 flex items-center justify-around rounded-2xl border border-[#E0E7FF] bg-[#F9FAFF] px-4 py-3 text-center text-sm">
+            <div className="mt-4 flex items-center justify-around rounded-[26px] border border-[#E0E7FF] bg-[#F9FAFF] px-4 py-3 text-center text-sm">
               <div>
                 <p className="text-xl font-semibold text-[#1BA37A]">{event.responses.registered}</p>
                 <p className="text-xs text-[#8B95BF]">Registered</p>
