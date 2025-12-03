@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Camera, Check, Clock } from 'lucide-react';
+import { Camera, Check, Clock, Plus, Search } from 'lucide-react';
 
 type TaskStatus = 'pending' | 'waiting_approval' | 'done';
 
@@ -17,7 +17,7 @@ interface DutyRosterProps {
   className: string;
 }
 
-export default function DutyRoster({ className }: DutyRosterProps) {
+export default function DutyRoster({ className: _ }: DutyRosterProps) {
   const [viewMode, setViewMode] = useState<'my' | 'full'>('my');
 
   const leaderboard = [
@@ -69,6 +69,12 @@ export default function DutyRoster({ className }: DutyRosterProps) {
   ];
 
   const filteredTasks = viewMode === 'my' ? tasks.filter((task) => task.assignee === 'You') : tasks;
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const searchedTasks = filteredTasks.filter((task) =>
+    task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    task.assignee.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const statusBadge = {
     pending: 'text-[#F39C12] border border-[#F39C12]/30 bg-[#FDF1E2]',
@@ -77,43 +83,23 @@ export default function DutyRoster({ className }: DutyRosterProps) {
   } satisfies Record<TaskStatus, string>;
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-[34px] border border-[#E0E6FA] bg-linear-to-br from-[#FDFEFF] to-[#F2F5FF] px-5 py-5 shadow-[0_14px_38px_rgba(27,40,88,0.18)]">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#7B86B0]">{className}</p>
-            <h1 className="text-2xl font-semibold text-[#0B1637]">Duty cockpit</h1>
-            <p className="text-sm text-[#7D89B7]">Monitor, capture, and clear operations.</p>
-          </div>
-          <div className="rounded-3xl border border-[#E1E5FF] bg-white/90 px-4 py-2 text-center text-xs">
-            <p className="font-semibold text-[#0B1637] uppercase tracking-[0.3em]">Top contributors</p>
-            <div className="mt-2 flex items-center justify-center gap-3 text-sm font-semibold text-[#2E58FF]">
-              {topThree.map((entry) => (
-                <span key={entry.rank} className="flex items-center gap-1">
-                  {entry.badge}
-                  {entry.name.split(' ')[0]}
-                </span>
-              ))}
-            </div>
-          </div>
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9BA5C9]">
+          <Search size={16} />
         </div>
-        <div className="mt-4 flex gap-2 rounded-[26px] border border-[#E0E6FA] bg-[#F7F8FF] p-1 text-sm">
-          {['my', 'full'].map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode as 'my' | 'full')}
-              className={`flex-1 rounded-2xl py-2.5 capitalize transition ${
-                viewMode === mode ? 'bg-white text-[#2E58FF] shadow-[0_8px_18px_rgba(62,92,211,0.2)]' : 'text-[#8A92BB]'
-              }`}
-            >
-              {mode === 'my' ? 'My duties' : 'Full schedule'}
-            </button>
-          ))}
-        </div>
-      </section>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search duties..."
+          className="w-full rounded-xl border border-[#e5e5ec] bg-white py-2.5 pl-10 pr-4 text-[13px] text-[#1a1a2e] placeholder:text-[#a0a0b0] focus:border-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/5"
+        />
+      </div>
 
       <section className="space-y-4">
-        {filteredTasks.map((task) => (
+        {searchedTasks.map((task) => (
           <div
             key={task.id}
             className="rounded-[32px] border border-[#E1E6FB] bg-white/95 px-5 py-5 shadow-[0_14px_26px_rgba(28,40,89,0.12)]"
@@ -157,25 +143,6 @@ export default function DutyRoster({ className }: DutyRosterProps) {
             )}
           </div>
         ))}
-      </section>
-
-      <section className="rounded-[28px] border border-[#E1E6FB] bg-white px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#9BA5C9]">Contribution pulse</p>
-            <h2 className="text-lg font-semibold text-[#0B1738]">Leaderboard</h2>
-          </div>
-          <span className="text-xs text-[#7D89B7]">Top 3 students</span>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-          {topThree.map((entry) => (
-            <div key={entry.rank} className="rounded-2xl border border-[#E1E6FB] bg-[#F8F9FF] px-3 py-3">
-              <div className="text-3xl">{entry.avatar}</div>
-              <p className="mt-1 text-xs font-semibold text-[#0B1738]">{entry.name}</p>
-              <p className="text-[11px] text-[#7D89B7]">{entry.points} pts</p>
-            </div>
-          ))}
-        </div>
       </section>
     </div>
   );

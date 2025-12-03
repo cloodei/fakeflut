@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, MapPin, Users, QrCode, Check, X } from 'lucide-react';
+import { Calendar, MapPin, Users, QrCode, Check, Plus, Search } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 
 interface EventItem {
@@ -21,10 +21,11 @@ interface EventsProps {
   className: string;
 }
 
-export default function Events({ className }: EventsProps) {
+export default function Events({ className: _ }: EventsProps) {
   const [showAdminView, setShowAdminView] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [events, setEvents] = useState<EventItem[]>([
     {
@@ -59,7 +60,7 @@ export default function Events({ className }: EventsProps) {
     }
   ]);
 
-  const handleResponse = (eventId: number, response: 'registered' | 'declined') => {
+  const handleResponse = (eventId: number) => {
     setEvents((prev) =>
       prev.map((event) => {
         if (event.id !== eventId) return event;
@@ -69,27 +70,17 @@ export default function Events({ className }: EventsProps) {
           updated.noResponse -= 1;
         } else if (event.userResponse === 'registered') {
           updated.registered -= 1;
-        } else {
-          updated.declined -= 1;
         }
 
-        if (response === 'registered') {
-          updated.registered += 1;
-        } else {
-          updated.declined += 1;
-        }
+        updated.registered += 1;
 
         return {
           ...event,
-          userResponse: response,
+          userResponse: 'registered',
           responses: updated
         };
       })
     );
-  };
-
-  const handlePingNonResponders = (event: EventItem) => {
-    alert(`Pinging ${event.responses.noResponse} classmates for ${event.title}`);
   };
 
   const handleShowQR = (event: EventItem) => {
@@ -103,27 +94,27 @@ export default function Events({ className }: EventsProps) {
     { name: 'No Response', value: event.responses.noResponse, color: '#A0AEC0' }
   ];
 
+  const filteredEvents = events.filter((event) =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    event.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-5">
-      <section className="rounded-[34px] border border-[#DDE2FB] bg-linear-to-br from-white to-[#F3F5FF] px-5 py-5 shadow-[0_16px_38px_rgba(30,45,102,0.15)]">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#7D89B7]">{className}</p>
-            <h1 className="text-2xl font-semibold text-[#0E1B3D]">Events & Attendance</h1>
-            <p className="text-sm text-[#7B86B0]">RSVP orchestration, check-ins, and nudges.</p>
-          </div>
-          <button
-            onClick={() => setShowAdminView(!showAdminView)}
-            className={`flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-semibold transition ${
-              showAdminView
-                ? 'border-[#FFD6E4] bg-[#FFF5F8] text-[#C53F6F]'
-                : 'border-[#E0E6FF] bg-white/80 text-[#2E58FF]'
-            }`}
-          >
-            <Users size={16} /> {showAdminView ? 'Admin view' : 'User view'}
-          </button>
+    <div className="space-y-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9BA5C9]">
+          <Search size={16} />
         </div>
-      </section>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search events..."
+          className="w-full rounded-xl border border-[#e5e5ec] bg-white py-2.5 pl-10 pr-4 text-[13px] text-[#1a1a2e] placeholder:text-[#a0a0b0] focus:border-[#1a1a2e] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/5"
+        />
+      </div>
 
       {showQRCode && selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-6 backdrop-blur">
@@ -147,7 +138,7 @@ export default function Events({ className }: EventsProps) {
       )}
 
       <section className="space-y-4">
-        {events.map((event) => (
+        {filteredEvents.map((event) => (
           <div
             key={event.id}
             className="rounded-[32px] border border-[#DFE4FB] bg-white/95 px-5 py-5 shadow-[0_12px_28px_rgba(25,39,94,0.12)]"
@@ -173,57 +164,18 @@ export default function Events({ className }: EventsProps) {
               </div>
             </div>
 
-            {event.userResponse && !showAdminView && (
-              <div
-                className={`mt-4 flex items-center gap-2 rounded-[22px] border px-3 py-3 text-sm ${
-                  event.userResponse === 'registered'
-                    ? 'border-[#B1E5D4] bg-[#F0FBF7] text-[#1BA37A]'
-                    : 'border-[#F8C5CD] bg-[#FFF1F3] text-[#E05264]'
-                }`}
-              >
-                {event.userResponse === 'registered' ? <Check size={16} /> : <X size={16} />}
-                {event.userResponse === 'registered'
-                  ? "You're registered for this event"
-                  : 'You declined this event'}
-              </div>
-            )}
-
             {!showAdminView && (
-              <div className="mt-4 flex flex-col gap-3">
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleResponse(event.id, 'registered')}
-                    disabled={event.userResponse === 'registered'}
-                    className={`flex-1 rounded-[24px] py-3 text-sm font-semibold uppercase tracking-[0.25em] ${
-                      event.userResponse === 'registered'
-                        ? 'bg-[#F3F5FF] text-[#A7B2D7]'
-                        : 'bg-[#2F3E9E] text-white shadow-[0_12px_28px_rgba(47,62,158,0.3)]'
-                    }`}
-                  >
-                    Join
-                  </button>
-                  <button
-                    onClick={() => handleResponse(event.id, 'declined')}
-                    disabled={event.userResponse === 'declined'}
-                    className={`flex-1 rounded-[24px] border py-3 text-sm font-semibold uppercase tracking-[0.25em] ${
-                      event.userResponse === 'declined'
-                        ? 'border-[#E0E7FF] text-[#C3CADF]'
-                        : 'border-[#E0E7FF] text-[#5B678C]'
-                    }`}
-                  >
-                    Decline
-                  </button>
-                </div>
+              <div className="mt-4">
                 <button
-                  onClick={() => handlePingNonResponders(event)}
-                  disabled={event.responses.noResponse === 0}
-                  className={`flex items-center justify-center gap-2 rounded-[24px] border border-dashed py-3 text-sm font-semibold ${
-                    event.responses.noResponse === 0
-                      ? 'border-[#E6E9FF] text-[#B7BEDC]'
-                      : 'border-[#FFCA7A] text-[#7B4100]'
+                  onClick={() => handleResponse(event.id)}
+                  disabled={event.userResponse === 'registered'}
+                  className={`flex w-full items-center justify-center gap-2 rounded-[24px] py-3 text-sm font-semibold uppercase tracking-[0.25em] ${
+                    event.userResponse === 'registered'
+                      ? 'bg-[#F3F5FF] text-[#A7B2D7]'
+                      : 'bg-[#2F3E9E] text-white shadow-[0_12px_28px_rgba(47,62,158,0.3)]'
                   }`}
                 >
-                  Ping non-responders ({event.responses.noResponse})
+                  <Check size={16} /> Join
                 </button>
               </div>
             )}
@@ -261,17 +213,6 @@ export default function Events({ className }: EventsProps) {
                 </div>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handlePingNonResponders(event)}
-                    disabled={event.responses.noResponse === 0}
-                    className={`flex-1 rounded-[22px] py-3 text-sm font-semibold ${
-                      event.responses.noResponse === 0
-                        ? 'bg-[#F3F5FF] text-[#A7B2D7]'
-                        : 'bg-[#FFCA7A] text-[#7B4100]'
-                    }`}
-                  >
-                    Ping non-responders ({event.responses.noResponse})
-                  </button>
-                  <button
                     onClick={() => handleShowQR(event)}
                     className="rounded-[22px] border border-[#E0E7FF] px-4 py-3 text-sm font-semibold text-[#2E58FF]"
                   >
@@ -281,21 +222,13 @@ export default function Events({ className }: EventsProps) {
               </div>
             )}
 
-            <div className="mt-4 flex items-center justify-around rounded-[26px] border border-[#E0E7FF] bg-[#F9FAFF] px-4 py-3 text-center text-sm">
-              <div>
-                <p className="text-xl font-semibold text-[#1BA37A]">{event.responses.registered}</p>
-                <p className="text-xs text-[#8B95BF]">Registered</p>
-              </div>
-              <div className="h-10 w-px bg-[#E0E7FF]" />
-              <div>
-                <p className="text-xl font-semibold text-[#FF6B6B]">{event.responses.declined}</p>
-                <p className="text-xs text-[#8B95BF]">Declined</p>
-              </div>
-              <div className="h-10 w-px bg-[#E0E7FF]" />
-              <div>
-                <p className="text-xl font-semibold text-[#A0AEC0]">{event.responses.noResponse}</p>
-                <p className="text-xs text-[#8B95BF]">No response</p>
-              </div>
+            <div className="mt-4 flex items-center justify-between rounded-[22px] border border-[#E0E7FF] bg-[#F9FAFF] px-4 py-3 text-sm text-[#5B678C]">
+              <span>Registered</span>
+              <span className="text-[#1BA37A] font-semibold">
+                {event.responses.registered}/{
+                  event.responses.registered + event.responses.declined + event.responses.noResponse
+                }
+              </span>
             </div>
           </div>
         ))}

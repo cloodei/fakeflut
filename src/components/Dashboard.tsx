@@ -1,23 +1,13 @@
-import {
-  Bell,
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  ArrowUpRight,
-  Camera,
-  CalendarDays,
-  Zap
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 
 type NotificationTone = 'alert' | 'info' | 'success';
 
 interface DashboardProps {
   userName: string;
   classTitle: string;
-  onNavigateToEvents?: () => void;
 }
 
-export default function Dashboard({ userName, classTitle, onNavigateToEvents }: DashboardProps) {
+export default function Dashboard({ userName: _, classTitle }: DashboardProps) {
   const notifications = [
     {
       id: 1,
@@ -42,107 +32,72 @@ export default function Dashboard({ userName, classTitle, onNavigateToEvents }: 
     }
   ];
 
-  const recentGrid = [
-    { label: 'Duty proof approved', meta: 'Whiteboard sterilized', tag: '+10 pts' },
-    { label: 'VR kit returned', meta: 'Asset board updated', tag: 'Assets' },
-    { label: 'Attendance synced', meta: 'AI Forum 68 RSVPs', tag: 'Events' },
-    { label: 'New duty drafted', meta: 'Floor sweep · Friday', tag: 'Duties' }
+  const leaderboard = [
+    { name: 'Sarah L.', points: 450, chip: 'Lead', detail: '8 duties cleared' },
+    { name: 'John S.', points: 380, chip: 'Focus', detail: '5 audits logged' },
+    { name: 'You', points: 320, chip: 'Assist', detail: '3 quick assists' }
   ];
 
-  const quickActions = [
-    {
-      title: 'Submit duty proof',
-      subtitle: 'Camera + gallery',
-      icon: <Camera size={16} />
-    },
-    {
-      title: 'Ping non-responders',
-      subtitle: '18 reminders pending',
-      icon: <Zap size={16} />,
-      onClick: onNavigateToEvents
-    },
-    {
-      title: 'Schedule briefing',
-      subtitle: 'Calendar sync',
-      icon: <CalendarDays size={16} />
-    }
+  const recentActivities = [
+    { label: 'Duty', detail: 'Proof approved · Whiteboard sterilized', tone: 'info' as NotificationTone },
+    { label: 'Funds', detail: '₫1.2M reimbursed · Advisor verified', tone: 'success' as NotificationTone },
+    { label: 'Assets', detail: 'VR kit returned · Assets board updated', tone: 'alert' as NotificationTone }
   ];
+
+  const leaderboardStyles = ['border-[#B7C5FF] bg-[#F4F6FF]', 'border-[#F8D6A4] bg-[#FFF8EF]', 'border-[#C7EBDC] bg-[#F3FBF7]'];
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-[32px] border border-[#CBD5FF] bg-linear-to-br from-white to-[#EEF2FF] px-5 py-5 shadow-[0_20px_40px_rgba(3,7,18,0.08)]">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.32em] text-[#7A86B6]">Class view · {classTitle}</p>
-            <h1 className="text-2xl font-semibold text-[#0B1532]">Hi {userName}, all ops synced.</h1>
-            <p className="text-sm text-[#5C678C]">Keep duties, events, and funds within two taps.</p>
+    <div className="space-y-6 px-2">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-[#7A86B6]">Notifications</p>
+
+      <div className="space-y-2">
+        {notifications.map((note) => (
+          <div key={note.id} className={`flex items-start gap-3 border-l-2 px-3 py-3 text-sm ${toneStyles[note.type]}`}>
+            <div className="text-xs uppercase tracking-[0.3em] text-[#6A769E]">{note.chip}</div>
+            <div className="flex-1">
+              <p className="font-semibold text-[#0B1532]">{note.title}</p>
+              <p className="text-xs text-[#5C678C]">{note.detail}</p>
+            </div>
+            {note.type === 'alert' && <AlertTriangle size={16} className="text-[#B45321]" />}
+            {note.type === 'info' && <Info size={16} className="text-[#3346B0]" />}
+            {note.type === 'success' && <CheckCircle2 size={16} className="text-[#1A7F5A]" />}
           </div>
-          <button className="relative rounded-2xl border border-[#E1E6FF] bg-white/80 p-3 text-[#55608A]">
-            <Bell size={18} />
-            <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-[#FFB347] text-[10px] font-semibold text-[#0B1532]">
-              3
-            </span>
-          </button>
+        ))}
+      </div>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between text-sm text-[#69729B]">
+          <span className="text-[11px] uppercase tracking-[0.3em]">Leaderboard</span>
+          <span>{classTitle}</span>
         </div>
-        <div className="mt-4 space-y-3">
-          {notifications.map((note) => (
+        <div className="space-y-2">
+          {leaderboard.map((entry, index) => (
             <div
-              key={note.id}
-              className={`flex items-start gap-3 rounded-3xl border px-4 py-3 text-sm ${toneStyles[note.type]}`}
+              key={entry.name}
+              className={`flex items-center gap-3 border-l-2 px-3 py-3 text-sm ${leaderboardStyles[index] ?? leaderboardStyles[0]}`}
             >
-              <span className="text-xs font-semibold uppercase tracking-[0.3em]">{note.chip}</span>
+              <div className="text-xs uppercase tracking-[0.3em] text-[#6A769E]">{entry.chip}</div>
               <div className="flex-1">
-                <p className="font-semibold">{note.title}</p>
-                <p className="text-xs opacity-80">{note.detail}</p>
+                <p className="font-semibold text-[#0B1532]">{entry.name}</p>
+                <p className="text-xs text-[#5C678C]">{entry.detail}</p>
               </div>
-              {note.type === 'alert' && <AlertTriangle size={16} />}
-              {note.type === 'info' && <Info size={16} />}
-              {note.type === 'success' && <CheckCircle2 size={16} />}
+              <div className="text-right text-xs text-[#7A86B6]">
+                <p className="text-base font-semibold text-[#0B1532]">{entry.points} pts</p>
+                <p>#{index + 1}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-[32px] border border-[#CBD5FF] bg-white px-5 py-5 shadow-[0_18px_32px_rgba(3,7,18,0.08)]">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#7A86B6]">Recent activity</p>
-            <h2 className="text-lg font-semibold text-[#0B1532]">Catch-up grid</h2>
-          </div>
-          <button
-            onClick={onNavigateToEvents}
-            className="flex items-center gap-1 rounded-2xl border border-[#E1E6FF] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#2F3E9E]"
-          >
-            Events <ArrowUpRight size={12} />
-          </button>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {recentGrid.map((item) => (
-            <div key={item.label} className="rounded-2xl border border-[#E4E7FB] bg-[#F8F9FF] px-3 py-3">
-              <p className="text-[11px] uppercase tracking-[0.3em] text-[#96A1C8]">{item.tag}</p>
-              <p className="text-sm font-semibold text-[#0B1532]">{item.label}</p>
-              <p className="text-xs text-[#6A769E]">{item.meta}</p>
+      <section>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#7A86B6]">Recent activity</p>
+        <div className="mt-3 space-y-2">
+          {recentActivities.map((item) => (
+            <div key={item.detail} className={`flex gap-3 border-l-2 px-3 py-3 text-xs ${toneStyles[item.tone]}`}>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-[#6A769E]">{item.label}</div>
+              <p className="flex-1 text-[#5C678C]">{item.detail}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-[32px] border border-[#CBD5FF] bg-[#F8F9FF] px-5 py-5 shadow-[0_18px_32px_rgba(3,7,18,0.08)]">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#7A86B6]">Action hub</p>
-        <div className="mt-4 space-y-3">
-          {quickActions.map((action) => (
-            <button
-              key={action.title}
-              onClick={action.onClick}
-              className="flex items-center gap-3 rounded-3xl border border-[#E4E7FB] bg-white px-4 py-3 text-left text-sm font-semibold text-[#0B1532] hover:border-[#2F3E9E]"
-            >
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-[#EEF1FF] text-[#2F3E9E]">{action.icon}</div>
-              <div className="flex-1">
-                <p>{action.title}</p>
-                <p className="text-xs text-[#6A769E]">{action.subtitle}</p>
-              </div>
-              <ArrowUpRight size={16} className="text-[#A4AED4]" />
-            </button>
           ))}
         </div>
       </section>
@@ -150,7 +105,7 @@ export default function Dashboard({ userName, classTitle, onNavigateToEvents }: 
   );
 }
 const toneStyles: Record<NotificationTone, string> = {
-  alert: 'border-[#FFD1AF] bg-[#FFF7EF] text-[#7A3E11]',
-  info: 'border-[#D8E1FF] bg-[#EEF2FF] text-[#1E2F6F]',
-  success: 'border-[#C2EBDC] bg-[#F1FBF7] text-[#0F3A2B]'
+  alert: 'border-[#F6A878] bg-[#FFF7F0]',
+  info: 'border-[#9FB6FF] bg-[#F3F5FF]',
+  success: 'border-[#9CD8C3] bg-[#F4FBF7]'
 };
