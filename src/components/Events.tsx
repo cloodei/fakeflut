@@ -19,9 +19,10 @@ interface EventItem {
 
 interface EventsProps {
   className: string;
+  onCreateClick: () => void;
 }
 
-export default function Events({ className: _ }: EventsProps) {
+export default function Events({ className: _, onCreateClick }: EventsProps) {
   const [showAdminView, setShowAdminView] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
@@ -101,7 +102,7 @@ export default function Events({ className: _ }: EventsProps) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
       {/* Search Bar */}
       <div className="relative">
         <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9BA5C9]">
@@ -233,6 +234,14 @@ export default function Events({ className: _ }: EventsProps) {
           </div>
         ))}
       </section>
+
+      {/* FAB Button */}
+      <button
+        onClick={onCreateClick}
+        className="fixed bottom-24 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a2e] text-white shadow-lg shadow-[#1a1a2e]/30 transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+      >
+        <Plus size={24} />
+      </button>
     </div>
   );
 }

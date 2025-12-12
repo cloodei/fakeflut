@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Receipt, AlertCircle, Download } from 'lucide-react';
+import { TrendingUp, TrendingDown, Receipt, AlertCircle, Download, Plus } from 'lucide-react';
 
 type TransactionType = 'income' | 'expense';
 
@@ -21,11 +21,15 @@ interface DebtEntry {
   dueDate: string;
 }
 
-export default function Funds() {
+interface FundsProps {
+  onCreateClick: () => void;
+}
+
+export default function Funds({ onCreateClick }: FundsProps) {
   const [showDebtList, setShowDebtList] = useState(true);
   const totalBalance = 5000000;
 
-  const transactions: Transaction[] = [
+  const [transactions, setTransactions] = useState<Transaction[]>([
     {
       id: 1,
       type: 'income',
@@ -80,7 +84,7 @@ export default function Funds() {
       hasReceipt: false,
       category: 'Contribution'
     }
-  ];
+  ]);
 
   const debtList: DebtEntry[] = [
     {
@@ -119,7 +123,7 @@ export default function Funds() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
       <section className="rounded-3xl border border-white/40 bg-linear-to-br from-[#1F2F78] to-[#3F73FF] px-5 py-5 text-white shadow-[0_20px_45px_rgba(36,61,136,0.35)]">
         <div className="flex items-start justify-between">
           <div>
@@ -246,6 +250,14 @@ export default function Funds() {
           </div>
         </div>
       </section>
+
+      {/* FAB Button */}
+      <button
+        onClick={onCreateClick}
+        className="fixed bottom-24 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a2e] text-white shadow-lg shadow-[#1a1a2e]/30 transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+      >
+        <Plus size={24} />
+      </button>
     </div>
   );
 }

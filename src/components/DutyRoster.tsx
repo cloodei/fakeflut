@@ -15,21 +15,20 @@ interface Task {
 
 interface DutyRosterProps {
   className: string;
+  onCreateClick: () => void;
 }
 
-export default function DutyRoster({ className: _ }: DutyRosterProps) {
-  const [viewMode, setViewMode] = useState<'my' | 'full'>('my');
+export default function DutyRoster({ className: _, onCreateClick }: DutyRosterProps) {
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const leaderboard = [
-    { rank: 1, name: 'Sarah Lee', points: 450, avatar: '👩', badge: '🥇' },
-    { rank: 2, name: 'John Smith', points: 380, avatar: '👨', badge: '🥈' },
-    { rank: 3, name: 'You', points: 320, avatar: '👤', badge: '🥉' },
-    { rank: 4, name: 'Mike Chen', points: 280, avatar: '👨‍💼', badge: '' },
-    { rank: 5, name: 'Emma Wilson', points: 250, avatar: '👩‍💼', badge: '' }
-  ];
-  const topThree = leaderboard.slice(0, 3);
+  const statusBadge = {
+    pending: 'text-[#F39C12] border border-[#F39C12]/30 bg-[#FDF1E2]',
+    waiting_approval: 'text-[#C97C00] border border-[#C97C00]/30 bg-[#FFF5DB]',
+    done: 'text-[#1BA37A] border border-[#1BA37A]/30 bg-[#E4F8F1]'
+  } satisfies Record<TaskStatus, string>;
 
-  const tasks: Task[] = [
+
+  const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
       title: 'Clean Whiteboard',
@@ -66,24 +65,15 @@ export default function DutyRoster({ className: _ }: DutyRosterProps) {
       status: 'pending',
       points: 10
     }
-  ];
+  ]);
 
-  const filteredTasks = viewMode === 'my' ? tasks.filter((task) => task.assignee === 'You') : tasks;
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const searchedTasks = filteredTasks.filter((task) =>
+  const searchedTasks = tasks.filter((task) =>
     task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     task.assignee.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const statusBadge = {
-    pending: 'text-[#F39C12] border border-[#F39C12]/30 bg-[#FDF1E2]',
-    waiting_approval: 'text-[#C97C00] border border-[#C97C00]/30 bg-[#FFF5DB]',
-    done: 'text-[#1BA37A] border border-[#1BA37A]/30 bg-[#E4F8F1]'
-  } satisfies Record<TaskStatus, string>;
-
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
       {/* Search Bar */}
       <div className="relative">
         <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9BA5C9]">
@@ -144,6 +134,15 @@ export default function DutyRoster({ className: _ }: DutyRosterProps) {
           </div>
         ))}
       </section>
+
+      {/* FAB Button */}
+      <button
+        onClick={onCreateClick}
+        className="fixed bottom-24 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1a1a2e] text-white shadow-lg shadow-[#1a1a2e]/30 transition-all hover:scale-105 hover:shadow-xl active:scale-95"
+      >
+        <Plus size={24} />
+      </button>
     </div>
   );
 }
+

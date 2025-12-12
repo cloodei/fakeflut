@@ -24,6 +24,9 @@ import Funds from './components/Funds';
 import Events from './components/Events';
 import AuthScreen from './components/AuthScreen';
 import Profile from './components/Profile';
+import CreateDuty from './components/CreateDuty';
+import CreateEvent from './components/CreateEvent';
+import CreateFundLog from './components/CreateFundLog';
 
 type Stage = 'hero' | 'auth' | 'setup' | 'app';
 type Tab = 'dashboard' | 'duties' | 'events' | 'assets' | 'funds' | 'profile';
@@ -61,6 +64,7 @@ export default function App() {
   const [showNavPanel, setShowNavPanel] = useState(false);
   const [showLeaderboardSheet, setShowLeaderboardSheet] = useState(false);
   const [showNotificationsSheet, setShowNotificationsSheet] = useState(false);
+  const [createScreen, setCreateScreen] = useState<'duty' | 'event' | 'fund' | null>(null);
 
   const navNames: Record<Exclude<Tab, 'dashboard'>, string> = {
     duties: 'Duty roster',
@@ -144,13 +148,13 @@ export default function App() {
           />
         );
       case 'duties':
-        return <DutyRoster className={selectedClass.name} />;
+        return <DutyRoster className={selectedClass.name} onCreateClick={() => setCreateScreen('duty')} />;
       case 'events':
-        return <Events className={selectedClass.name} />;
+        return <Events className={selectedClass.name} onCreateClick={() => setCreateScreen('event')} />;
       case 'assets':
         return <Assets className={selectedClass.name} />;
       case 'funds':
-        return <Funds />;
+        return <Funds onCreateClick={() => setCreateScreen('fund')} />;
       case 'profile':
         return <Profile userName={profile.displayName} onLogout={handleLogout} onBack={() => setActiveTab('dashboard')} />;
       default:
@@ -184,6 +188,87 @@ export default function App() {
       contentClass=""
       fullScreen
     >
+      {/* Create Screens - rendered without AppBar */}
+      {createScreen && (
+        <div className="relative flex min-h-full flex-col">
+          {/* Status bar */}
+          <div className="relative z-10 flex items-center justify-between bg-white px-8 pt-4 pb-2 text-[13px] font-medium text-[#1a1a2e]">
+            <span>9:41</span>
+            <div className="flex items-center gap-1.5">
+              <Wifi size={15} strokeWidth={2} />
+              <BatteryFull size={22} strokeWidth={1.5} />
+            </div>
+          </div>
+          {/* Create Screen Content */}
+          <main className="flex-1 overflow-y-auto bg-[#f5f6f8] px-5 py-4">
+            {createScreen === 'duty' && (
+              <CreateDuty
+                onBack={() => setCreateScreen(null)}
+                onSubmit={(duty) => {
+                  console.log('New duty:', duty);
+                  setCreateScreen(null);
+                }}
+              />
+            )}
+            {createScreen === 'event' && (
+              <CreateEvent
+                onBack={() => setCreateScreen(null)}
+                onSubmit={(event) => {
+                  console.log('New event:', event);
+                  setCreateScreen(null);
+                }}
+              />
+            )}
+            {createScreen === 'fund' && (
+              <CreateFundLog
+                onBack={() => setCreateScreen(null)}
+                onSubmit={(log) => {
+                  console.log('New fund log:', log);
+                  setCreateScreen(null);
+                }}
+              />
+            )}
+          </main>
+          {/* Bottom Navigation */}
+          <nav className="z-10">
+            <div className="flex h-14 items-center justify-around border-t border-[#e8e8f0] bg-white px-2 text-[#4A4F6B]">
+              {(
+                [
+                  { key: 'dashboard', label: 'Home', icon: Home },
+                  { key: 'duties', label: 'Duties', icon: ClipboardList },
+                  { key: 'events', label: 'Events', icon: Calendar },
+                  { key: 'assets', label: 'Assets', icon: Package },
+                  { key: 'funds', label: 'Funds', icon: Wallet },
+                  { key: 'profile', label: 'Profile', icon: UserCircle }
+                ] as { key: Tab; label: string; icon: typeof Home }[]
+              ).map((tab) => {
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => {
+                      setCreateScreen(null);
+                      setActiveTab(tab.key);
+                    }}
+                    className={`flex flex-1 flex-col items-center gap-0.5 py-1.5 text-[11px] font-medium transition ${
+                      isActive ? 'text-[#1a1a2e]' : 'text-[#8F95B2]'
+                    }`}
+                  >
+                    <tab.icon
+                      size={20}
+                      strokeWidth={isActive ? 2 : 1.5}
+                      className={`${isActive ? 'text-[#1a1a2e]' : 'text-[#a0a0b0]'} transition`}
+                    />
+                    <span className="text-[9px] tracking-wide">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        </div>
+      )}
+      {/* Normal Class View */}
+      {!createScreen && (
       <div className="relative flex min-h-full flex-col">
           {isDashboard ? (
             <header className="relative overflow-hidden bg-[#1a1a2e] px-5 pt-12 pb-5 text-white">
@@ -396,6 +481,7 @@ export default function App() {
           </div>
         </nav>
       </div>
+      )}
     </StageScreen>
   );
 }
